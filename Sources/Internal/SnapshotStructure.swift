@@ -3,60 +3,60 @@ import DifferenceKit
 
 public struct SnapshotStructure<SectionID: Hashable, ItemID: Hashable> {
     public struct Item: Differentiable, Equatable {
-        var differenceIdentifier: ItemID
-        var isReloaded: Bool
+        public var differenceIdentifier: ItemID
+        public var isReloaded: Bool
 
-        init(id: ItemID, isReloaded: Bool) {
+        public init(id: ItemID, isReloaded: Bool) {
             self.differenceIdentifier = id
             self.isReloaded = isReloaded
         }
 
-        init(id: ItemID) {
+        public init(id: ItemID) {
             self.init(id: id, isReloaded: false)
         }
 
-        func isContentEqual(to source: Item) -> Bool {
+        public func isContentEqual(to source: Item) -> Bool {
             return !isReloaded && differenceIdentifier == source.differenceIdentifier
         }
     }
 
     public struct Section: DifferentiableSection, Equatable {
-        var differenceIdentifier: SectionID
-        var elements: [Item] = []
-        var isReloaded: Bool
+        public var differenceIdentifier: SectionID
+        public var elements: [Item] = []
+        public var isReloaded: Bool
 
-        init(id: SectionID, items: [Item], isReloaded: Bool) {
+        public init(id: SectionID, items: [Item], isReloaded: Bool) {
             self.differenceIdentifier = id
             self.elements = items
             self.isReloaded = isReloaded
         }
 
-        init(id: SectionID) {
+        public init(id: SectionID) {
             self.init(id: id, items: [], isReloaded: false)
         }
 
-        init<C: Swift.Collection>(source: Section, elements: C) where C.Element == Item {
+        public init<C: Swift.Collection>(source: Section, elements: C) where C.Element == Item {
             self.init(id: source.differenceIdentifier, items: Array(elements), isReloaded: source.isReloaded)
         }
 
-        func isContentEqual(to source: Section) -> Bool {
+        public func isContentEqual(to source: Section) -> Bool {
             return !isReloaded && differenceIdentifier == source.differenceIdentifier
         }
     }
 
-    var sections: [Section] = []
+    public var sections: [Section] = []
 
-    var allSectionIDs: [SectionID] {
+    public var allSectionIDs: [SectionID] {
         return sections.map { $0.differenceIdentifier }
     }
 
-    var allItemIDs: [ItemID] {
+    public var allItemIDs: [ItemID] {
         return sections.lazy
             .flatMap { $0.elements }
             .map { $0.differenceIdentifier }
     }
 
-    func items(in sectionID: SectionID, file: StaticString = #file, line: UInt = #line) -> [ItemID] {
+    public func items(in sectionID: SectionID, file: StaticString = #file, line: UInt = #line) -> [ItemID] {
         guard let sectionIndex = sectionIndex(of: sectionID) else {
             specifiedSectionIsNotFound(sectionID, file: file, line: line)
         }
@@ -64,11 +64,11 @@ public struct SnapshotStructure<SectionID: Hashable, ItemID: Hashable> {
         return sections[sectionIndex].elements.map { $0.differenceIdentifier }
     }
 
-    func section(containing itemID: ItemID) -> SectionID? {
+    public func section(containing itemID: ItemID) -> SectionID? {
         return itemPositionMap()[itemID]?.section.differenceIdentifier
     }
 
-    mutating func append(itemIDs: [ItemID], to sectionID: SectionID? = nil, file: StaticString = #file, line: UInt = #line) {
+    public mutating func append(itemIDs: [ItemID], to sectionID: SectionID? = nil, file: StaticString = #file, line: UInt = #line) {
         let index: Array<Section>.Index
 
         if let sectionID = sectionID {
@@ -90,7 +90,7 @@ public struct SnapshotStructure<SectionID: Hashable, ItemID: Hashable> {
         sections[index].elements.append(contentsOf: items)
     }
 
-    mutating func insert(itemIDs: [ItemID], before beforeItemID: ItemID, file: StaticString = #file, line: UInt = #line) {
+    public mutating func insert(itemIDs: [ItemID], before beforeItemID: ItemID, file: StaticString = #file, line: UInt = #line) {
         guard let itemPosition = itemPositionMap()[beforeItemID] else {
             specifiedItemIsNotFound(beforeItemID, file: file, line: line)
         }
@@ -99,7 +99,7 @@ public struct SnapshotStructure<SectionID: Hashable, ItemID: Hashable> {
         sections[itemPosition.sectionIndex].elements.insert(contentsOf: items, at: itemPosition.itemRelativeIndex)
     }
 
-    mutating func insert(itemIDs: [ItemID], after afterItemID: ItemID, file: StaticString = #file, line: UInt = #line) {
+    public mutating func insert(itemIDs: [ItemID], after afterItemID: ItemID, file: StaticString = #file, line: UInt = #line) {
         guard let itemPosition = itemPositionMap()[afterItemID] else {
             specifiedItemIsNotFound(afterItemID, file: file, line: line)
         }
@@ -109,7 +109,7 @@ public struct SnapshotStructure<SectionID: Hashable, ItemID: Hashable> {
         sections[itemPosition.sectionIndex].elements.insert(contentsOf: items, at: itemIndex)
     }
 
-    mutating func remove(itemIDs: [ItemID]) {
+    public mutating func remove(itemIDs: [ItemID]) {
         let itemPositionMap = self.itemPositionMap()
         var removeIndexSetMap = [Int: IndexSet]()
 
@@ -128,13 +128,13 @@ public struct SnapshotStructure<SectionID: Hashable, ItemID: Hashable> {
         }
     }
 
-    mutating func removeAllItems() {
+    public mutating func removeAllItems() {
         for sectionIndex in sections.indices {
             sections[sectionIndex].elements.removeAll()
         }
     }
 
-    mutating func move(itemID: ItemID, before beforeItemID: ItemID, file: StaticString = #file, line: UInt = #line) {
+    public mutating func move(itemID: ItemID, before beforeItemID: ItemID, file: StaticString = #file, line: UInt = #line) {
         guard let removed = remove(itemID: itemID) else {
             specifiedItemIsNotFound(itemID, file: file, line: line)
         }
@@ -146,7 +146,7 @@ public struct SnapshotStructure<SectionID: Hashable, ItemID: Hashable> {
         sections[itemPosition.sectionIndex].elements.insert(removed, at: itemPosition.itemRelativeIndex)
     }
 
-    mutating func move(itemID: ItemID, after afterItemID: ItemID, file: StaticString = #file, line: UInt = #line) {
+    public mutating func move(itemID: ItemID, after afterItemID: ItemID, file: StaticString = #file, line: UInt = #line) {
         guard let removed = remove(itemID: itemID) else {
             specifiedItemIsNotFound(itemID, file: file, line: line)
         }
@@ -159,7 +159,7 @@ public struct SnapshotStructure<SectionID: Hashable, ItemID: Hashable> {
         sections[itemPosition.sectionIndex].elements.insert(removed, at: itemIndex)
     }
 
-    mutating func update(itemIDs: [ItemID], file: StaticString = #file, line: UInt = #line) {
+    public mutating func update(itemIDs: [ItemID], file: StaticString = #file, line: UInt = #line) {
         let itemPositionMap = self.itemPositionMap()
 
         for itemID in itemIDs {
@@ -171,12 +171,12 @@ public struct SnapshotStructure<SectionID: Hashable, ItemID: Hashable> {
         }
     }
 
-    mutating func append(sectionIDs: [SectionID]) {
+    public mutating func append(sectionIDs: [SectionID]) {
         let newSections = sectionIDs.lazy.map(Section.init)
         sections.append(contentsOf: newSections)
     }
 
-    mutating func insert(sectionIDs: [SectionID], before beforeSectionID: SectionID, file: StaticString = #file, line: UInt = #line) {
+    public mutating func insert(sectionIDs: [SectionID], before beforeSectionID: SectionID, file: StaticString = #file, line: UInt = #line) {
         guard let sectionIndex = sectionIndex(of: beforeSectionID) else {
             specifiedSectionIsNotFound(beforeSectionID, file: file, line: line)
         }
@@ -185,7 +185,7 @@ public struct SnapshotStructure<SectionID: Hashable, ItemID: Hashable> {
         sections.insert(contentsOf: newSections, at: sectionIndex)
     }
 
-    mutating func insert(sectionIDs: [SectionID], after afterSectionID: SectionID, file: StaticString = #file, line: UInt = #line) {
+    public mutating func insert(sectionIDs: [SectionID], after afterSectionID: SectionID, file: StaticString = #file, line: UInt = #line) {
         guard let beforeIndex = sectionIndex(of: afterSectionID) else {
             specifiedSectionIsNotFound(afterSectionID, file: file, line: line)
         }
@@ -195,13 +195,13 @@ public struct SnapshotStructure<SectionID: Hashable, ItemID: Hashable> {
         sections.insert(contentsOf: newSections, at: sectionIndex)
     }
 
-    mutating func remove(sectionIDs: [SectionID]) {
+    public mutating func remove(sectionIDs: [SectionID]) {
         for sectionID in sectionIDs {
             remove(sectionID: sectionID)
         }
     }
 
-    mutating func move(sectionID: SectionID, before beforeSectionID: SectionID, file: StaticString = #file, line: UInt = #line) {
+    public mutating func move(sectionID: SectionID, before beforeSectionID: SectionID, file: StaticString = #file, line: UInt = #line) {
         guard let removed = remove(sectionID: sectionID) else {
             specifiedSectionIsNotFound(sectionID, file: file, line: line)
         }
@@ -213,7 +213,7 @@ public struct SnapshotStructure<SectionID: Hashable, ItemID: Hashable> {
         sections.insert(removed, at: sectionIndex)
     }
 
-    mutating func move(sectionID: SectionID, after afterSectionID: SectionID, file: StaticString = #file, line: UInt = #line) {
+    public mutating func move(sectionID: SectionID, after afterSectionID: SectionID, file: StaticString = #file, line: UInt = #line) {
         guard let removed = remove(sectionID: sectionID) else {
             specifiedSectionIsNotFound(sectionID, file: file, line: line)
         }
@@ -226,7 +226,7 @@ public struct SnapshotStructure<SectionID: Hashable, ItemID: Hashable> {
         sections.insert(removed, at: sectionIndex)
     }
 
-    mutating func update(sectionIDs: [SectionID]) {
+    public mutating func update(sectionIDs: [SectionID]) {
         for sectionID in sectionIDs {
             guard let sectionIndex = sectionIndex(of: sectionID) else {
                 continue
