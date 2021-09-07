@@ -3,7 +3,7 @@ import QuartzCore
 import DifferenceKit
 
 public final class DiffableDataSourceCore<SectionIdentifierType: Hashable, ItemIdentifierType: Hashable> {
-    typealias Section = SnapshotStructure<SectionIdentifierType, ItemIdentifierType>.Section
+    public typealias Section = SnapshotStructure<SectionIdentifierType, ItemIdentifierType>.Section
 
     private let dispatcher = MainThreadSerialDispatcher()
     private var currentSnapshot = DiffableDataSourceSnapshot<SectionIdentifierType, ItemIdentifierType>()
