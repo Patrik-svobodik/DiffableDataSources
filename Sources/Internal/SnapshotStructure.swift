@@ -1,8 +1,8 @@
 import Foundation
 import DifferenceKit
 
-struct SnapshotStructure<SectionID: Hashable, ItemID: Hashable> {
-    struct Item: Differentiable, Equatable {
+public struct SnapshotStructure<SectionID: Hashable, ItemID: Hashable> {
+    public struct Item: Differentiable, Equatable {
         var differenceIdentifier: ItemID
         var isReloaded: Bool
 
@@ -20,7 +20,7 @@ struct SnapshotStructure<SectionID: Hashable, ItemID: Hashable> {
         }
     }
 
-    struct Section: DifferentiableSection, Equatable {
+    public struct Section: DifferentiableSection, Equatable {
         var differenceIdentifier: SectionID
         var elements: [Item] = []
         var isReloaded: Bool
@@ -237,7 +237,7 @@ struct SnapshotStructure<SectionID: Hashable, ItemID: Hashable> {
     }
 }
 
-private extension SnapshotStructure {
+public extension SnapshotStructure {
     struct ItemPosition {
         var item: Item
         var itemRelativeIndex: Int
