@@ -2,14 +2,14 @@ import Foundation
 import QuartzCore
 import DifferenceKit
 
-final class DiffableDataSourceCore<SectionIdentifierType: Hashable, ItemIdentifierType: Hashable> {
+public final class DiffableDataSourceCore<SectionIdentifierType: Hashable, ItemIdentifierType: Hashable> {
     typealias Section = SnapshotStructure<SectionIdentifierType, ItemIdentifierType>.Section
 
     private let dispatcher = MainThreadSerialDispatcher()
     private var currentSnapshot = DiffableDataSourceSnapshot<SectionIdentifierType, ItemIdentifierType>()
     private var sections: [Section] = []
 
-    func apply<View: AnyObject>(
+    public func apply<View: AnyObject>(
         _ snapshot: DiffableDataSourceSnapshot<SectionIdentifierType, ItemIdentifierType>,
         view: View?,
         animatingDifferences: Bool,
@@ -51,13 +51,13 @@ final class DiffableDataSourceCore<SectionIdentifierType: Hashable, ItemIdentifi
         }
     }
 
-    func snapshot() -> DiffableDataSourceSnapshot<SectionIdentifierType, ItemIdentifierType> {
+    public func snapshot() -> DiffableDataSourceSnapshot<SectionIdentifierType, ItemIdentifierType> {
         var snapshot = DiffableDataSourceSnapshot<SectionIdentifierType, ItemIdentifierType>()
         snapshot.structure.sections = currentSnapshot.structure.sections
         return snapshot
     }
 
-    func itemIdentifier(for indexPath: IndexPath) -> ItemIdentifierType? {
+    public func itemIdentifier(for indexPath: IndexPath) -> ItemIdentifierType? {
         guard 0..<sections.endIndex ~= indexPath.section else {
             return nil
         }
@@ -71,7 +71,7 @@ final class DiffableDataSourceCore<SectionIdentifierType: Hashable, ItemIdentifi
         return items[indexPath.item].differenceIdentifier
     }
 
-    func unsafeItemIdentifier(for indexPath: IndexPath, file: StaticString = #file, line: UInt = #line) -> ItemIdentifierType {
+    public func unsafeItemIdentifier(for indexPath: IndexPath, file: StaticString = #file, line: UInt = #line) -> ItemIdentifierType {
         guard let itemIdentifier = itemIdentifier(for: indexPath) else {
             universalError("Item not found at the specified index path(\(indexPath)).")
         }
@@ -79,7 +79,7 @@ final class DiffableDataSourceCore<SectionIdentifierType: Hashable, ItemIdentifi
         return itemIdentifier
     }
 
-    func indexPath(for itemIdentifier: ItemIdentifierType) -> IndexPath? {
+    public func indexPath(for itemIdentifier: ItemIdentifierType) -> IndexPath? {
         let indexPathMap: [ItemIdentifierType: IndexPath] = sections.enumerated()
             .reduce(into: [:]) { result, section in
                 for (itemIndex, item) in section.element.elements.enumerated() {
@@ -92,11 +92,11 @@ final class DiffableDataSourceCore<SectionIdentifierType: Hashable, ItemIdentifi
         return indexPathMap[itemIdentifier]
     }
 
-    func numberOfSections() -> Int {
+    public func numberOfSections() -> Int {
         return sections.count
     }
 
-    func numberOfItems(inSection section: Int) -> Int {
+    public func numberOfItems(inSection section: Int) -> Int {
         return sections[section].elements.count
     }
 }
