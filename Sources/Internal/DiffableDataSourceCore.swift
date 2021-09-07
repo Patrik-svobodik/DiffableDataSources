@@ -9,6 +9,8 @@ public final class DiffableDataSourceCore<SectionIdentifierType: Hashable, ItemI
     private var currentSnapshot = DiffableDataSourceSnapshot<SectionIdentifierType, ItemIdentifierType>()
     private var sections: [Section] = []
 
+    public init() {}
+    
     public func apply<View: AnyObject>(
         _ snapshot: DiffableDataSourceSnapshot<SectionIdentifierType, ItemIdentifierType>,
         view: View?,
